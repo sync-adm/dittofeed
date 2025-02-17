@@ -37,8 +37,7 @@ services:
     environment:
       <<: *backend-app-env
       # comment out after initial setup
-      BOOTSTRAP: "true"
-    # README: To add local env variables uncomment the following line and add a .env file in the root directory
+      BOOTSTRAP: "true"    
       env_file:
         - .env
     networks:
@@ -58,7 +57,6 @@ services:
       - clickhouse-server
     environment:
       <<: *backend-app-env
-    # README: To add local env variables uncomment the following line and add a .env file in the root directory
       env_file:
         - .env
     networks:
