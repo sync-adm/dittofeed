@@ -60,6 +60,7 @@ services:
       - .env
     networks:
       - dittofeed-network-lite
+      - coolify
   admin-cli:
     image: dittofeed/dittofeed-admin-cli:${IMAGE_TAG:-v0.20.0}
     entrypoint: []
@@ -108,9 +109,10 @@ services:
       - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/prod.yaml
     image: temporalio/auto-setup:${TEMPORAL_VERSION:-1.22.4}
     labels:
-      kompose.volume.type: configMap
+      "kompose.volume.type": configMap
     networks:
       - dittofeed-network-lite
+      - coolify
     ports:
       - 7233:7233
     volumes:
@@ -147,6 +149,7 @@ services:
       - postgres:/var/lib/postgresql/data
     networks:
       - dittofeed-network-lite
+      - coolify
   clickhouse-server:
     image: clickhouse/clickhouse-server:23.8.8.20-alpine
     restart: always
@@ -184,11 +187,13 @@ services:
       - blob-storage:/data
     command: server --console-address ":9001" /data
 volumes:
-  postgres: null
-  clickhouse_lib: null
-  clickhouse_log: null
-  blob-storage: null
+  postgres:
+  clickhouse_lib:
+  clickhouse_log:
+  blob-storage:
 networks:
   dittofeed-network-lite:
     driver: bridge
     name: dittofeed-network-lite
+    coolify:
+      external: true
