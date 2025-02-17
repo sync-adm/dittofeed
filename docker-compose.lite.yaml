@@ -60,7 +60,6 @@ services:
       - .env
     networks:
       - dittofeed-network-lite
-      - coolify
   admin-cli:
     image: dittofeed/dittofeed-admin-cli:${IMAGE_TAG:-v0.20.0}
     entrypoint: []
@@ -112,7 +111,6 @@ services:
       "kompose.volume.type": configMap
     networks:
       - dittofeed-network-lite
-      - coolify
     ports:
       - 7233:7233
     volumes:
@@ -149,7 +147,6 @@ services:
       - postgres:/var/lib/postgresql/data
     networks:
       - dittofeed-network-lite
-      - coolify
   clickhouse-server:
     image: clickhouse/clickhouse-server:23.8.8.20-alpine
     restart: always
@@ -195,5 +192,3 @@ networks:
   dittofeed-network-lite:
     driver: bridge
     name: dittofeed-network-lite
-    coolify:
-      external: true
