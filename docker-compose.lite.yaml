@@ -88,8 +88,8 @@ services:
       SECRET_KEY: ${SECRET_KEY:-GEGL1RHjFVOxIO80Dp8+ODlZPOjm2IDBJB/UunHlf3c=}
       PASSWORD: ${PASSWORD:-password}
       DASHBOARD_API_BASE: ${DASHBOARD_API_BASE:-http://localhost:3000}
-      env_file:
-        - .env
+    env_file:
+      - .env
     networks:
       - dittofeed-network-lite
   temporal:
