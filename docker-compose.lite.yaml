@@ -38,8 +38,8 @@ services:
       <<: *backend-app-env
       # comment out after initial setup
       BOOTSTRAP: "true"    
-      env_file:
-        - .env
+  env_file:
+    - .env
     networks:
       - dittofeed-network-lite
   # useful for upgrading dittofeed
