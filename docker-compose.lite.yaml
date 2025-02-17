@@ -1,12 +1,16 @@
+---
 version: "3.9"
-x-database-credentials: &database-credentials
+x-database-credentials:
   DATABASE_USER: ${DATABASE_USER:-postgres}
   DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
-x-clickhouse-credentials: &clickhouse-credentials
+x-clickhouse-credentials:
   CLICKHOUSE_USER: ${CLICKHOUSE_USER:-dittofeed}
   CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-password}
-x-backend-app-env: &backend-app-env
-  <<: [*clickhouse-credentials, *database-credentials]
+x-backend-app-env:
+  CLICKHOUSE_USER: ${CLICKHOUSE_USER:-dittofeed}
+  CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-password}
+  DATABASE_USER: ${DATABASE_USER:-postgres}
+  DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
   NODE_ENV: production
   DATABASE_HOST: ${DATABASE_HOST:-postgres}
   DATABASE_PORT: ${DATABASE_PORT:-5432}
@@ -21,42 +25,69 @@ services:
   lite:
     image: dittofeed/dittofeed-lite:${IMAGE_TAG:-v0.20.0}
     restart: always
-    command: node --max-old-space-size=${LITE_MEM_LIMIT:-824} ./packages/lite/dist/scripts/startLite.js --workspace-name=${WORKSPACE_NAME:-Default}
+    command: node --max-old-space-size=${LITE_MEM_LIMIT:-824}
+      ./packages/lite/dist/scripts/startLite.js
+      --workspace-name=${WORKSPACE_NAME:-Default}
     logging:
-      driver: "local"
+      driver: local
     deploy:
       resources:
         limits:
           memory: ${LITE_CONTAINER_MEM_LIMIT:-1024}m
     ports:
-      - "3000:3000"
+      - 3000:3000
     depends_on:
       - postgres
       - temporal
       - clickhouse-server
     environment:
-      <<: *backend-app-env
-      # comment out after initial setup
-      BOOTSTRAP: "true"    
-  env_file:
-    - .env
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-dittofeed}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-password}
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
+      NODE_ENV: production
+      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      CLICKHOUSE_HOST: ${CLICKHOUSE_HOST:-http://clickhouse-server:8123}
+      TEMPORAL_ADDRESS: ${TEMPORAL_ADDRESS:-temporal:7233}
+      WORKSPACE_NAME: ${WORKSPACE_NAME:-Default}
+      AUTH_MODE: ${AUTH_MODE:-single-tenant}
+      SECRET_KEY: ${SECRET_KEY:-GEGL1RHjFVOxIO80Dp8+ODlZPOjm2IDBJB/UunHlf3c=}
+      PASSWORD: ${PASSWORD:-password}
+      DASHBOARD_API_BASE: ${DASHBOARD_API_BASE:-http://localhost:3000}
+      BOOTSTRAP: "true"
+    env_file:
+      - .env
     networks:
       - dittofeed-network-lite
-  # useful for upgrading dittofeed
   admin-cli:
     image: dittofeed/dittofeed-admin-cli:${IMAGE_TAG:-v0.20.0}
     entrypoint: []
-    profiles: ["admin-cli"]
+    profiles:
+      - admin-cli
     command: tail -f /dev/null
     tty: true
     logging:
-      driver: "local"
+      driver: local
     depends_on:
       - postgres
       - temporal
       - clickhouse-server
     environment:
-      <<: *backend-app-env
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-dittofeed}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-password}
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
+      NODE_ENV: production
+      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      CLICKHOUSE_HOST: ${CLICKHOUSE_HOST:-http://clickhouse-server:8123}
+      TEMPORAL_ADDRESS: ${TEMPORAL_ADDRESS:-temporal:7233}
+      WORKSPACE_NAME: ${WORKSPACE_NAME:-Default}
+      AUTH_MODE: ${AUTH_MODE:-single-tenant}
+      SECRET_KEY: ${SECRET_KEY:-GEGL1RHjFVOxIO80Dp8+ODlZPOjm2IDBJB/UunHlf3c=}
+      PASSWORD: ${PASSWORD:-password}
+      DASHBOARD_API_BASE: ${DASHBOARD_API_BASE:-http://localhost:3000}
       env_file:
         - .env
     networks:
@@ -65,7 +96,7 @@ services:
     container_name: temporal
     restart: always
     logging:
-      driver: "local"
+      driver: local
     depends_on:
       - postgres
     environment:
@@ -85,11 +116,12 @@ services:
     volumes:
       - ./packages/backend-lib/temporal-dynamicconfig:/etc/temporal/config/dynamicconfig
   temporal-ui:
-    profiles: ["temporal-ui"]
+    profiles:
+      - temporal-ui
     container_name: temporal-ui
     restart: always
     logging:
-      driver: "local"
+      driver: local
     depends_on:
       - temporal
     environment:
@@ -104,13 +136,13 @@ services:
     image: postgres:${POSTGRES_VERSION:-15}
     restart: always
     logging:
-      driver: "local"
+      driver: local
     environment:
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-password}
       - POSTGRES_USER=${DATABASE_USER:-postgres}
       - POSTGRES_DB=dittofeed
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
@@ -119,31 +151,32 @@ services:
     image: clickhouse/clickhouse-server:23.8.8.20-alpine
     restart: always
     logging:
-      driver: "local"
+      driver: local
     deploy:
       resources:
         limits:
           memory: ${CLICKHOUSE_CONTAINER_MEM_LIMIT:-1024}m
     environment:
-      <<: *clickhouse-credentials
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-dittofeed}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-password}
     ports:
-      - "8123:8123"
-      - "9000:9000"
-      - "9009:9009"
+      - 8123:8123
+      - 9000:9000
+      - 9009:9009
     volumes:
       - clickhouse_lib:/var/lib/clickhouse
       - clickhouse_log:/var/log/clickhouse-server
     networks:
       - dittofeed-network-lite
-  # Note that minio is only used for local development. In production, use any S3-compatible storage.
   blob-storage:
     image: minio/minio
-    profiles: ["blob-storage"]
+    profiles:
+      - blob-storage
     logging:
-      driver: "local"
+      driver: local
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - 9000:9000
+      - 9001:9001
     environment:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: password
@@ -151,11 +184,10 @@ services:
       - blob-storage:/data
     command: server --console-address ":9001" /data
 volumes:
-  postgres:
-  clickhouse_lib:
-  clickhouse_log:
-  blob-storage:
-
+  postgres: null
+  clickhouse_lib: null
+  clickhouse_log: null
+  blob-storage: null
 networks:
   dittofeed-network-lite:
     driver: bridge
