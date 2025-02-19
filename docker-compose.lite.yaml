@@ -29,7 +29,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${LITE_CONTAINER_MEM_LIMIT}m
+          memory: ${LITE_CONTAINER_MEM_LIMIT}
     ports:
       - "3000:3000"
     depends_on:
