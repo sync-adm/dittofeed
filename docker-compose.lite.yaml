@@ -1,12 +1,12 @@
 version: "3.9"
 
 x-database-credentials: &database-credentials
-  DATABASE_USER: ${DATABASE_USER}
-  DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+  DATABASE_USER: ${DATABASE_USER:-postgres}
+  DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
 
 x-clickhouse-credentials: &clickhouse-credentials
-  CLICKHOUSE_USER: ${CLICKHOUSE_USER}
-  CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+  CLICKHOUSE_USER: ${CLICKHOUSE_USER:-dittofeed}
+  CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-password}
 
 x-backend-app-env: &backend-app-env
   <<: [*clickhouse-credentials, *database-credentials]
@@ -25,7 +25,7 @@ services:
   lite:
     image: dittofeed/dittofeed-lite:${IMAGE_TAG:-v0.20.0}
     restart: unless-stopped
-    command: node --max-old-space-size=${LITE_MEM_LIMIT} ./packages/lite/dist/scripts/startLite.js --workspace-name=${WORKSPACE_NAME}
+    command: node --max-old-space-size=${LITE_MEM_LIMIT} ./packages/lite/dist/scripts/startLite.js --workspace-name=${WORKSPACE_NAME:-Default}
     deploy:
       resources:
         limits:
