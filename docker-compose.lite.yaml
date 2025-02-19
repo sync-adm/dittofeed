@@ -40,7 +40,7 @@ services:
       <<: *backend-app-env
       BOOTSTRAP: "true"
     networks:
-      - coolify
+      - dittofeed-network-lite
 
   temporal:
     image: temporalio/auto-setup:${TEMPORAL_VERSION:-1.22.4}
@@ -57,7 +57,7 @@ services:
     ports:
       - "7233:7233"
     networks:
-      - coolify
+      - dittofeed-network-lite
 
   postgres:
     image: postgres:${POSTGRES_VERSION:-15}
@@ -69,7 +69,7 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
-      - coolify
+      - dittofeed-network-lite
 
   clickhouse-server:
     image: clickhouse/clickhouse-server:23.8.8.20-alpine
@@ -80,7 +80,7 @@ services:
       - clickhouse_lib:/var/lib/clickhouse
       - clickhouse_log:/var/log/clickhouse-server
     networks:
-      - coolify
+      - dittofeed-network-lite
 
 volumes:
   postgres:
@@ -88,5 +88,5 @@ volumes:
   clickhouse_log:
 
 networks:
-  coolify:
+  dittofeed-network-lite:
     external: true
