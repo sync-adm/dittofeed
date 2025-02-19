@@ -23,7 +23,7 @@ x-backend-app-env: &backend-app-env
 
 services:
   lite:
-    image: dittofeed/dittofeed-lite:${IMAGE_TAG}
+    image: dittofeed/dittofeed-lite:${IMAGE_TAG:-v0.20.0}
     restart: unless-stopped
     command: node --max-old-space-size=${LITE_MEM_LIMIT} ./packages/lite/dist/scripts/startLite.js --workspace-name=${WORKSPACE_NAME}
     deploy:
@@ -60,7 +60,7 @@ services:
       - coolify
 
   postgres:
-    image: postgres:${POSTGRES_VERSION}
+    image: postgres:${POSTGRES_VERSION:-15}
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
