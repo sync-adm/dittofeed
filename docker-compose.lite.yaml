@@ -11,15 +11,15 @@ x-clickhouse-credentials: &clickhouse-credentials
 x-backend-app-env: &backend-app-env
   <<: [*clickhouse-credentials, *database-credentials]
   NODE_ENV: production
-  DATABASE_HOST: ${DATABASE_HOST}
-  DATABASE_PORT: ${DATABASE_PORT}
-  CLICKHOUSE_HOST: ${CLICKHOUSE_HOST}
-  TEMPORAL_ADDRESS: ${TEMPORAL_ADDRESS}
-  WORKSPACE_NAME: ${WORKSPACE_NAME}
-  AUTH_MODE: ${AUTH_MODE}
-  SECRET_KEY: ${SECRET_KEY}
-  PASSWORD: ${PASSWORD}
-  DASHBOARD_API_BASE: ${DASHBOARD_API_BASE}
+  DATABASE_HOST: ${DATABASE_HOST:-postgres}
+  DATABASE_PORT: ${DATABASE_PORT:-5432}
+  CLICKHOUSE_HOST: ${CLICKHOUSE_HOST:-http://clickhouse-server:8123}
+  TEMPORAL_ADDRESS: ${TEMPORAL_ADDRESS:-temporal:7233}
+  WORKSPACE_NAME: ${WORKSPACE_NAME:-Default}
+  AUTH_MODE: ${AUTH_MODE:-single-tenant}
+  SECRET_KEY: ${SECRET_KEY:-GEGL1RHjFVOxIO80Dp8+ODlZPOjm2IDBJB/UunHlf3c=}
+  PASSWORD: ${PASSWORD:-password}
+  DASHBOARD_API_BASE: ${DASHBOARD_API_BASE:-http://localhost:3000}
 
 services:
   lite:
